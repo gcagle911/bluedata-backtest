@@ -1,29 +1,27 @@
-files_api_base: ""   # not used for JSON direct URLs
+# Source: daily 1‑minute JSON files in GCS
+data_source: "json_gcs"
+json_url_template: "https://storage.googleapis.com/garrettc-btc-bidspreadl20-data/archive/1min/{date}.json"
 
-exchange: "kraken"   # just metadata for filenames
-asset:    "BTC"
+# Map your JSON keys -> internal names
+field_map:
+  timestamp: "time"
+  price: "price"
+  s20: "spread_avg_L20_pct"   # only L20 is present (that’s fine)
 
+# Backtest window
 start_date: "2025-08-07"
 end_date:   "2025-09-02"
 
-horizon_sec: 300
-threshold_quantile: 0.80
-use_depths: [5, 20, 50, 100]
+# Label horizon and cadence
+horizon_sec: 300        # predict 5 minutes ahead
+cadence_seconds: 60     # your JSON is 1-min resolution
+
+# Features to consider (only s20 is required; others are optional if present)
+use_depths: [20]        # set [5,20,50,100] later if you add them
+
+# Output
 write_indicator_csv: true
 
-# === NEW: tell the loader to use your GCS JSONs ===
-data_source: "json_gcs"
-
-json_url_template: "https://storage.googleapis.com/garrettc-btc-bidspreadl20-data/archive/1min/{date}.json"
-# if your JSON keys differ from the CSV headers, map them here:
-field_map:
-  timestamp: "timestamp"     # or "ts"
-  price: "price"
-  best_bid: "best_bid"
-  best_ask: "best_ask"
-  s5: "s5"
-  s20: "s20"
-  s50: "s50"
-  s100: "s100"
-  bidv50: "bidv50"
-  askv50: "askv50"
+# (Optional metadata—used only for output file naming)
+exchange: "kraken"
+asset: "BTC"
